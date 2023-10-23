@@ -354,7 +354,7 @@ void encMenu(){
     string siv = printHex(iv);
     string cipher;
     auto start = std::chrono::high_resolution_clock::now();
-    for(int i = 0; i < 1000; i++){
+    for(int i = 0; i < 10000; i++){
         switch(mode){
             case 1:{
                 cipher = encECB(plain, skey);
@@ -394,7 +394,7 @@ void encMenu(){
         }
     }
     auto stop = std::chrono::high_resolution_clock::now();
-    duration<double, std::milli> duration = stop - start;
+    duration<double, std::milli> duration = (stop - start)/10000.0;
     switch (IOMode)
     {
     case 1:{
@@ -437,45 +437,47 @@ void decMenu(){
     string siv = printHex(iv);
     string plain;
     auto start = std::chrono::high_resolution_clock::now();
-    switch(mode){
-        case 1:{
-            plain = decECB(cipherstr, skey);
-            break;
+    for(int i = 0; i < 10000; i++){
+        switch(mode){
+            case 1:{
+                plain = decECB(cipherstr, skey);
+                break;
+            }
+            case 2:{
+                plain = decCBC(cipherstr, skey, siv);
+                break;
+            }
+            case 3:{
+                plain = decCFB(cipherstr, skey, siv);
+                break;
+            }
+            case 4:{
+                plain = decOFB(cipherstr, skey, siv);
+                break;
+            }
+            case 5:{
+                plain = decCTR(cipherstr, skey, siv);
+                break;
+            }
+            case 6:{
+                plain = decXTS(cipherstr, skey, siv);
+                break;
+            }
+            case 7:{
+                plain = decCCM(cipherstr, skey, siv);
+                break;
+            }
+            case 8:{
+                plain = decGCM(cipherstr, skey, siv);
+                break;
+            }
+            default:
+                wcout << L"Invalid input\n";
+                break;
         }
-        case 2:{
-            plain = decCBC(cipherstr, skey, siv);
-            break;
-        }
-        case 3:{
-            plain = decCFB(cipherstr, skey, siv);
-            break;
-        }
-        case 4:{
-            plain = decOFB(cipherstr, skey, siv);
-            break;
-        }
-        case 5:{
-            plain = decCTR(cipherstr, skey, siv);
-            break;
-        }
-        case 6:{
-            plain = decXTS(cipherstr, skey, siv);
-            break;
-        }
-        case 7:{
-            plain = decCCM(cipherstr, skey, siv);
-            break;
-        }
-        case 8:{
-            plain = decGCM(cipherstr, skey, siv);
-            break;
-        }
-        default:
-            wcout << L"Invalid input\n";
-            break;
     }
     auto stop = std::chrono::high_resolution_clock::now();
-    duration<double, std::milli> duration = stop - start;
+    duration<double, std::milli> duration = (stop - start)/10000.0;
     switch (IOMode)
     {
     case 1:{
