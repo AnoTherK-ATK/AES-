@@ -28,9 +28,7 @@ using CryptoPP::AES;
 
 #include "cryptopp/modes.h"
 using CryptoPP::ECB_Mode;
-
-#include "cryptopp/osrng.h"
-using CryptoPP::AutoSeededRandomPool;
+using CryptoPP::SecByteBlock;
 using CryptoPP::byte;
 
 class ECB{
