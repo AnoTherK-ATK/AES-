@@ -128,21 +128,20 @@ wstring inputPlainMenu(){
     switch (mode)
     {
         case 1: {
-            wcout << L"Please enter the file name?\n";
-            wstring filename;
-            wcin >> filename;
-            wcin.ignore();
-            wifstream in( wstring_to_string(filename) );
-            wstring filetext;
-            in >> filetext;
-            return filetext;
+            string str;
+            FileSource file("plain.txt", true, new StringSink(str));
+            wstring wstr = string_to_wstring(str);
+            wcout << L"plain text: " << wstr << endl;
+            return wstr;
             break;
         }
         case 2:{
             wcout << L"Please enter the plain text:\n";
-            //wcin.ignore();
+            wcin.ignore();
             wstring text;
             getline(wcin, text);
+            //wcin.ignore();
+            wcout << L"plain text: " << text << endl;
             return text;
             break;
         }
@@ -166,22 +165,20 @@ wstring inputCipherMenu(){
     switch (mode)
     {
         case 1: {
-            wcout << L"Please enter the file name?\n";
-            wstring filename;
-            wcin >> filename;
-            wcin.ignore();
-            wifstream in( wstring_to_string(filename) );
+            wifstream in( "cipher.txt",ios::binary );
             wstring filetext;
             in >> filetext;
+            wcout << L"cipher text: " << filetext << endl;
             return filetext;
             break;
         }
         case 2:{
             wcout << L"Please enter the ciphertext (Base64):\n";
-
+            //wcin.ignore();
             wstring text;
             wcin >> text;
             wcin.ignore();
+            wcout << L"cipher text: " << text << endl;
             return text;
             break;
         }
@@ -204,7 +201,7 @@ void encECB(wstring& plain, string& skey){
 
 void decECB(string& cipher, string& skey){
     ECB ecb;
-    cipher = Base64Decode(cipher);
+    cipher = (cipher);
     string plain = ecb.decrypt(cipher, hexDecode(skey));
     wcout << L"plain text: " << string_to_wstring(plain) << endl;
 }
@@ -234,7 +231,6 @@ void encMenu(){
     wcin.ignore();
     switch(keymode){
         case 1:{
-            wcout << L"Please enter the key (Base64):\n";
             inputKeyIV();
             break;
         }

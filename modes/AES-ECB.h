@@ -41,7 +41,7 @@ public:
         string cipher;
         SecByteBlock key(reinterpret_cast<const CryptoPP::byte*>(&skey[0]), skey.size());
         ECB_Mode< AES >::Encryption e;
-        e.SetKey(key, sizeof(key));
+        e.SetKey(key, key.size());
         StringSource s(plain, true, 
             new StreamTransformationFilter(e,
                 new StringSink(cipher)
@@ -54,7 +54,7 @@ public:
         string recovered;
         SecByteBlock key(reinterpret_cast<const CryptoPP::byte*>(&skey[0]), skey.size());
         ECB_Mode< AES >::Decryption d;
-        d.SetKey(key, sizeof(key));
+        d.SetKey(key, key.size());
         StringSource s(cipher, true, 
             new StreamTransformationFilter(d,
                 new StringSink(recovered)
