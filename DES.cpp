@@ -355,7 +355,7 @@ void encMenu(){
     default:
         break;
     }
-    wcout << fixed << setprecision(3) << L"Average time: " << duration.count() << L" microseconds" << endl;
+    wcout << fixed << setprecision(3) << L"Average time: " << duration.count() << L" ms" << endl;
 }
 
 
@@ -424,7 +424,7 @@ void decMenu(){
         break;
     }
    
-    wcout << fixed << setprecision(3) << L"Average time: " << duration.count() << L" microseconds" << endl;
+    wcout << fixed << setprecision(3) << L"Average time: " << duration.count() << L" ms" << endl;
 }
 
 int main(int argc, char* argv[])
