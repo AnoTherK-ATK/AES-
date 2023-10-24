@@ -88,7 +88,7 @@ using CryptoPP::GCM;
 using std::wstring_convert;
 #include <codecvt>
 using  std::codecvt_utf8;
-wstring string_to_wstring (const std::string& str);
+wstring  string_to_wstring(const std::string& str);
 string wstring_to_string (const std::wstring& str);
 
 #ifdef _WIN32
@@ -99,8 +99,6 @@ string wstring_to_string (const std::wstring& str);
 using namespace std;
 using namespace CryptoPP;
 
-wstring string_to_wstring(const string& str);
-string wstring_to_string(const wstring& str);
 
 AutoSeededRandomPool prng;
 SecByteBlock key(AES::DEFAULT_KEYLENGTH);
@@ -113,102 +111,105 @@ void randomKeyIV(){
 }
 
 void inputKeyIV(){
-    wcout << L"Please enter the key (Base64):\n";
-    wstring keywstr;
-    wcin >> keywstr;
-    wcin.ignore();
-    string keystr = wstring_to_string(keywstr);
+    cout << "Please enter the key (Base64):\n";
+    string keystr;
+    cin >> keystr;
+    cin.ignore();
     keystr = Base64Decode(keystr);
     key = SecByteBlock(reinterpret_cast<const CryptoPP::byte*>(&keystr[0]), keystr.size());
 
-    wcout << L"Please enter the iv (Base64):\n";
-    wstring ivwstr;
-    wcin >> ivwstr;
-    wcin.ignore();
-    string ivstr = wstring_to_string(ivwstr);
+    cout << "Please enter the iv (Base64):\n";
+    string ivstr;
+    cin >> ivstr;
+    cin.ignore();
     ivstr = Base64Decode(ivstr);
     iv = SecByteBlock(reinterpret_cast<const CryptoPP::byte*>(&ivstr[0]), ivstr.size());
 }
 
-wstring inputPlainMenu(){
-    wcout   << "Choose the input method:\n"
+string inputPlainMenu(){
+    cout   << "Choose the input method:\n"
             << "1. From file;\n"
             << "2. From console;\n"
             << "Please enter your number?\n";
     int mode;
-    wcin >> mode;
+    cin >> mode;
     IOMode = mode;
-    wcin.ignore();
+    cin.ignore();
     switch (mode)
     {
         case 1: {
             string str;
-            FileSource file("plain.txt", true, new StringSink(str));
-            wstring wstr = string_to_wstring(str);
-            //wcout << L"plain text: " << wstr << endl;
-            return wstr;
+            string filename;
+            cout << "Please enter the plain text file name:\n";
+            cin >> filename;
+            FileSource(filename.c_str(), true, new StringSink(str));
+            //wstring wstr = (str);
+            //wcout << "plain text: " << wstr << endl;
+            return str;
             break;
         }
         case 2:{
-            wcout << L"Please enter the plain text:\n";
-            wcin.ignore();
-            wstring text;
-            getline(wcin, text);
+            cout << "Please enter the plain text:\n";
+            cin.ignore();
+            string text;
+            getline(cin, text);
             //wcin.ignore();
-            wcout << L"plain text: " << text << endl;
+            cout << "plain text: " << text << endl;
             return text;
             break;
         }
 
         default:{
-            wcout << L"Invalid input, Please try again\n";
+            cout << "Invalid input, Please try again\n";
             return inputPlainMenu();
             break;
         }
     }
 }
 
-wstring inputCipherMenu(){
-    wcout   << "Choose the input method:\n"
+string inputCipherMenu(){
+    cout   << "Choose the input method:\n"
             << "1. From file;\n"
             << "2. From console;\n"
             << "Please enter your number?\n";
     int mode;
-    wcin >> mode;
+    cin >> mode;
     IOMode = mode;
-    wcin.ignore();
+    cin.ignore();
     switch (mode)
     {
         case 1: {
-            wifstream in( "cipher.txt",ios::binary );
-            wstring filetext;
-            in >> filetext;
-            //wcout << L"cipher text: " << filetext << endl;
-            return filetext;
+            string str;
+            string filename;
+            cout << "Please enter the ciphertext file name:\n";
+            cin >> filename;
+            FileSource(filename.c_str(), true, new StringSink(str));
+            //wcout << "cipher text: " << filetext << endl;
+            return str;
             break;
         }
         case 2:{
-            wcout << L"Please enter the ciphertext (Base64):\n";
+            cout << "Please enter the ciphertext (Base64):\n";
             //wcin.ignore();
-            wstring text;
-            wcin >> text;
-            wcin.ignore();
-            wcout << L"cipher text: " << text << endl;
+            string text;
+            cin >> text;
+            cin.ignore();
+            cout << "cipher text: " << text << endl;
             return text;
             break;
         }
 
         default:{
-            wcout << L"Invalid input, Please try again\n";
+            cout << "Invalid input, Please try again\n";
             return inputCipherMenu();
             break;
         }
     }
 }
 
-string encECB(wstring& plain, string& skey){
+string encECB(string& plain, string& skey){
     ECB ecb;
-    string cipher = ecb.encrypt(wstring_to_string(plain), hexDecode(skey));
+    string cipher = ecb.encrypt(plain, hexDecode(skey));
     return printBase64(cipher);
 }
 
@@ -219,9 +220,9 @@ string decECB(string& cipher, string& skey){
     return plain;
 }
 
-string encCBC(wstring& plain, string& skey, string& siv){
+string encCBC(string& plain, string& skey, string& siv){
     CBC cbc;
-    string cipher = cbc.encrypt(wstring_to_string(plain), hexDecode(skey), hexDecode(siv));
+    string cipher = cbc.encrypt(plain, hexDecode(skey), hexDecode(siv));
     return printBase64(cipher);
 }
 
@@ -232,9 +233,9 @@ string decCBC(string& cipher, string& skey, string& siv){
     return plain;
 }
 
-string encOFB(wstring& plain, string& skey, string& siv){
+string encOFB(string& plain, string& skey, string& siv){
     OFB ofb;
-    string cipher = ofb.encrypt(wstring_to_string(plain), hexDecode(skey), hexDecode(siv));
+    string cipher = ofb.encrypt(plain, hexDecode(skey), hexDecode(siv));
     return printBase64(cipher);
 }
 
@@ -245,9 +246,9 @@ string decOFB(string& cipher, string& skey, string& siv){
     return plain;
 }
 
-string encCFB(wstring& plain, string& skey, string& siv){
+string encCFB(string& plain, string& skey, string& siv){
     CFB cfb;
-    string cipher = cfb.encrypt(wstring_to_string(plain), hexDecode(skey), hexDecode(siv));
+    string cipher = cfb.encrypt(plain, hexDecode(skey), hexDecode(siv));
     return printBase64(cipher);
 }
 
@@ -258,9 +259,9 @@ string decCFB(string& cipher, string& skey, string& siv){
     return plain;
 }
 
-string encCTR(wstring& plain, string& skey, string& siv){
+string encCTR(string& plain, string& skey, string& siv){
     CTR ctr;
-    string cipher = ctr.encrypt(wstring_to_string(plain), hexDecode(skey), hexDecode(siv));
+    string cipher = ctr.encrypt(plain, hexDecode(skey), hexDecode(siv));
     return printBase64(cipher);
 }
 
@@ -271,9 +272,9 @@ string decCTR(string& cipher, string& skey, string& siv){
     return plain;
 }
 
-string encXTS(wstring& plain, string& skey, string& siv){
+string encXTS(string& plain, string& skey, string& siv){
     XTS_alter xts;
-    string cipher = xts.encrypt(wstring_to_string(plain), skey, siv);
+    string cipher = xts.encrypt(plain, skey, siv);
     return printBase64(cipher);
 }
 
@@ -284,9 +285,9 @@ string decXTS(string& cipher, string& skey, string& siv){
     return plain;
 }
 
-string encCCM(wstring& plain, string& skey, string& siv){
+string encCCM(string& plain, string& skey, string& siv){
     CCM_alter ccm;
-    string cipher = ccm.encrypt(wstring_to_string(plain), skey, siv);
+    string cipher = ccm.encrypt(plain, skey, siv);
     return printBase64(cipher);
 }
 
@@ -297,9 +298,9 @@ string decCCM(string& cipher, string& skey, string& siv){
     return plain;
 }
 
-string encGCM(wstring& plain, string& skey, string& siv){
+string encGCM(string& plain, string& skey, string& siv){
     GCM_alter gcm;
-    string cipher = gcm.encrypt(wstring_to_string(plain), skey, siv);
+    string cipher = gcm.encrypt(plain, skey, siv);
     return printBase64(cipher);
 }
 
@@ -312,8 +313,8 @@ string decGCM(string& cipher, string& skey, string& siv){
 
 
 void encMenu(){
-    wstring plain = inputPlainMenu();
-    wcout   << "Choose the mode:\n"
+    string plain = inputPlainMenu();
+    cout   << "Choose the mode:\n"
             << "1. ECB;\n"
             << "2. CBC;\n"
             << "3. CFB;\n"
@@ -324,15 +325,15 @@ void encMenu(){
             << "8. GCM;\n"
             << "Please enter your number?\n";
     int mode;
-    wcin >> mode;
-    wcin.ignore();
-    wcout << L"Would you like to enter key or generate random key?\n"
+    cin >> mode;
+    cin.ignore();
+    cout << "Would you like to enter key or generate random key?\n"
             << "1. Enter key;\n"
             << "2. Generate random key;\n"
             << "Please enter your number?\n";
     int keymode;
-    wcin >> keymode;
-    wcin.ignore();
+    cin >> keymode;
+    cin.ignore();
     switch(keymode){
         case 1:{
             inputKeyIV();
@@ -340,14 +341,14 @@ void encMenu(){
         }
         case 2:{
             randomKeyIV();
-            wcout << L"key (Hex): " << string_to_wstring(printHex(key)) << endl;
-            wcout << L"iv (Hex): " << string_to_wstring(printHex(iv)) << endl;
-            wcout << L"key (Base64): " << string_to_wstring(printBase64(key));
-            wcout << L"iv (Base64): " << string_to_wstring(printBase64(iv));
+            cout << "key (Hex): " << (printHex(key)) << endl;
+            cout << "iv (Hex): " << (printHex(iv)) << endl;
+            cout << "key (Base64): " << (printBase64(key));
+            cout << "iv (Base64): " << (printBase64(iv));
             break;
         }
         default:
-            wcout << L"Invalid input\n";
+            wcout << "Invalid input\n";
             break;
     }
     string skey = printHex(key);
@@ -389,7 +390,7 @@ void encMenu(){
                 break;
             }
             default:
-                wcout << L"Invalid input\n";
+                wcout << "Invalid input\n";
                 break;
         }
     }
@@ -398,26 +399,28 @@ void encMenu(){
     switch (IOMode)
     {
     case 1:{
-        wofstream out( "cipher.txt");
-        out << string_to_wstring(cipher);
-        wcout << L"ciphertext was written to cipher.txt" << endl;
+        string filename;
+        cout << "Please enter the ciphertext file name to be saved:\n";
+        cin >> filename;
+        StringSource(cipher, true, new FileSink(filename.c_str(), sizeof(key)));
+        cout << "ciphertext was written to " << filename << endl;
         break;
     }
     case 2:{
-        wcout << L"ciphertext (Base64): " << string_to_wstring(cipher) << endl;
+        cout << "ciphertext (Base64): " << (cipher) << endl;
         break;
     }
     default:
         break;
     }
-    wcout << fixed << setprecision(3) << L"Average time: " << duration.count() << L" ms" << endl;
+    cout << fixed << setprecision(3) << "Average time: " << duration.count() << " ms" << endl;
 }
 
 
 
 void decMenu(){
-    wstring cipher = inputCipherMenu();
-    wcout   << "Choose the mode:\n"
+    string cipher = inputCipherMenu();
+    cout   << "Choose the mode:\n"
             << "1. ECB;\n"
             << "2. CBC;\n"
             << "3. CFB;\n"
@@ -428,9 +431,9 @@ void decMenu(){
             << "8. GCM;\n"
             << "Please enter your number?\n";
     int mode;
-    wcin >> mode;
-    wcin.ignore();
-    string cipherstr = wstring_to_string(cipher);
+    cin >> mode;
+    cin.ignore();
+    string cipherstr = (cipher);
     cipherstr = Base64Decode(cipherstr);
     inputKeyIV();
     string skey = printHex(key);
@@ -472,7 +475,7 @@ void decMenu(){
                 break;
             }
             default:
-                wcout << L"Invalid input\n";
+                wcout << "Invalid input\n";
                 break;
         }
     }
@@ -481,20 +484,22 @@ void decMenu(){
     switch (IOMode)
     {
     case 1:{
-        wofstream out( "plain.txt");
-        out << string_to_wstring(plain);
-        wcout << L"plain text was written to cipher.txt" << endl;
+        string filename;
+        cout << "Please enter the plain text file name to be saved:\n";
+        cin >> filename;
+        StringSource(plain, true, new FileSink(filename.c_str(), sizeof(key)));
+        cout << "plain text was written to " << filename << endl;
         break;
     }
     case 2:{
-        wcout << L"plain text: " << string_to_wstring(plain) << endl;
+        cout << "plain text: " << (plain) << endl;
         break;
     }
     default:
         break;
     }
    
-    wcout << fixed << setprecision(3) << L"Average time: " << duration.count() << L" ms" << endl;
+    cout << fixed << setprecision(3) << "Average time: " << duration.count() << " ms" << endl;
 }
 
 int main(int argc, char* argv[])
@@ -507,22 +512,22 @@ int main(int argc, char* argv[])
     #endif
 
     int aescipher;
-    wcout << L"Would you like to encryption or decryption message:\n"
+    cout << "Would you like to encryption or decryption message:\n"
           << "1. key and iv generation;\n"
           << "2. encryption;\n"
           << "3. decryption;\n"
           << "Please enter your number?\n";
-    wcin >> aescipher;
-    wcin.ignore();
+    cin >> aescipher;
+    cin.ignore();
 
     switch (aescipher) {
         case 1: {
             randomKeyIV();
-            wcout << L"key (Hex): " << string_to_wstring(printHex(key)) << endl;
-            wcout << L"iv (Hex): " << string_to_wstring(printHex(iv)) << endl;
-            wcout << L"key (Base64): " << string_to_wstring(printBase64(key));
-            wcout << L"iv (Base64): " << string_to_wstring(printBase64(iv));
-            wcout << L"iv size: " << iv.size() << endl;
+            cout << "key (Hex): " << (printHex(key)) << endl;
+            cout << "iv (Hex): " << (printHex(iv)) << endl;
+            cout << "key (Base64): " << (printBase64(key));
+            cout << "iv (Base64): " << (printBase64(iv));
+            cout << "iv size: " << iv.size() << endl;
             break;
         }
         case 2: {
