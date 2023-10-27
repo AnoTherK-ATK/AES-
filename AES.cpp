@@ -30,7 +30,6 @@ using CryptoPP::Redirector; // string to bytes
 
 #include "cryptopp/osrng.h"
 using CryptoPP::AutoSeededRandomPool;
-using CryptoPP::byte;
 
 #include "cryptopp/cryptlib.h"
 using CryptoPP::Exception;
@@ -83,6 +82,12 @@ using CryptoPP::GCM;
 #include <fcntl.h>
 #else
 #endif
+
+#ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#undef WIN32_LEAN_AND_MEAN
+#endif
 /* Convert string <--> utf8*/
 #include <locale>
 using std::wstring_convert;
@@ -91,10 +96,6 @@ using  std::codecvt_utf8;
 wstring  string_to_wstring(const std::string& str);
 string wstring_to_string (const std::wstring& str);
 
-#ifdef _WIN32
-#include <io.h>
-#include <fcntl.h>
-#endif
 
 using namespace std;
 using namespace CryptoPP;
@@ -150,7 +151,7 @@ string inputPlainMenu(){
         }
         case 2:{
             cout << "Please enter the plain text:\n";
-            cin.ignore();
+            //cin.ignore();
             string text;
             getline(cin, text);
             //wcin.ignore();
@@ -207,110 +208,19 @@ string inputCipherMenu(){
     }
 }
 
-string encECB(string& plain, string& skey){
-    ECB ecb;
-    string cipher = ecb.encrypt(plain, hexDecode(skey));
+template <class T>
+string encTemplate(string& plain, string& skey, string& siv){
+    T mode;
+    string cipher = mode.encrypt(plain, hexDecode(skey), hexDecode(siv));
     return printBase64(cipher);
 }
 
-string decECB(string& cipher, string& skey){
-    ECB ecb;
-    cipher = (cipher);
-    string plain = ecb.decrypt(cipher, hexDecode(skey));
+template <class T>
+string decTemplate(string& cipher, string& skey, string& siv){
+    T mode;
+    string plain = mode.decrypt(cipher, hexDecode(skey), hexDecode(siv));
     return plain;
 }
-
-string encCBC(string& plain, string& skey, string& siv){
-    CBC cbc;
-    string cipher = cbc.encrypt(plain, hexDecode(skey), hexDecode(siv));
-    return printBase64(cipher);
-}
-
-string decCBC(string& cipher, string& skey, string& siv){
-    CBC cbc;
-    cipher = (cipher);
-    string plain = cbc.decrypt(cipher, hexDecode(skey), hexDecode(siv));
-    return plain;
-}
-
-string encOFB(string& plain, string& skey, string& siv){
-    OFB ofb;
-    string cipher = ofb.encrypt(plain, hexDecode(skey), hexDecode(siv));
-    return printBase64(cipher);
-}
-
-string decOFB(string& cipher, string& skey, string& siv){
-    OFB ofb;
-    cipher = (cipher);
-    string plain = ofb.decrypt(cipher, hexDecode(skey), hexDecode(siv));
-    return plain;
-}
-
-string encCFB(string& plain, string& skey, string& siv){
-    CFB cfb;
-    string cipher = cfb.encrypt(plain, hexDecode(skey), hexDecode(siv));
-    return printBase64(cipher);
-}
-
-string decCFB(string& cipher, string& skey, string& siv){
-    CFB cfb;
-    cipher = (cipher);
-    string plain = cfb.decrypt(cipher, hexDecode(skey), hexDecode(siv));
-    return plain;
-}
-
-string encCTR(string& plain, string& skey, string& siv){
-    CTR ctr;
-    string cipher = ctr.encrypt(plain, hexDecode(skey), hexDecode(siv));
-    return printBase64(cipher);
-}
-
-string decCTR(string& cipher, string& skey, string& siv){
-    CTR ctr;
-    cipher = (cipher);
-    string plain = ctr.decrypt(cipher, hexDecode(skey), hexDecode(siv));
-    return plain;
-}
-
-string encXTS(string& plain, string& skey, string& siv){
-    XTS_alter xts;
-    string cipher = xts.encrypt(plain, skey, siv);
-    return printBase64(cipher);
-}
-
-string decXTS(string& cipher, string& skey, string& siv){
-    XTS_alter xts;
-    cipher = (cipher);
-    string plain = xts.decrypt(cipher, skey, siv);
-    return plain;
-}
-
-string encCCM(string& plain, string& skey, string& siv){
-    CCM_alter ccm;
-    string cipher = ccm.encrypt(plain, skey, siv);
-    return printBase64(cipher);
-}
-
-string decCCM(string& cipher, string& skey, string& siv){
-    CCM_alter ccm;
-    cipher = (cipher);
-    string plain = ccm.decrypt(cipher, skey, siv);
-    return plain;
-}
-
-string encGCM(string& plain, string& skey, string& siv){
-    GCM_alter gcm;
-    string cipher = gcm.encrypt(plain, skey, siv);
-    return printBase64(cipher);
-}
-
-string decGCM(string& cipher, string& skey, string& siv){
-    GCM_alter gcm;
-    cipher = (cipher);
-    string plain = gcm.decrypt(cipher, skey, siv);
-    return plain;
-}
-
 
 void encMenu(){
     string plain = inputPlainMenu();
@@ -358,35 +268,35 @@ void encMenu(){
     for(int i = 0; i < 10000; i++){
         switch(mode){
             case 1:{
-                cipher = encECB(plain, skey);
+                cipher = encTemplate<ECB>(plain, skey, siv);
                 break;
             }
             case 2:{
-                cipher = encCBC(plain, skey, siv);
+                cipher = encTemplate<CBC>(plain, skey, siv);
                 break;
             }
             case 3:{
-                cipher = encCFB(plain, skey, siv);
+                cipher = encTemplate<CFB>(plain, skey, siv);
                 break;
             }
             case 4:{
-                cipher = encOFB(plain, skey, siv);
+                cipher = encTemplate<OFB>(plain, skey, siv);
                 break;
             }
             case 5:{
-                cipher = encCTR(plain, skey, siv);
+                cipher = encTemplate<CTR>(plain, skey, siv);
                 break;
             }
             case 6:{
-                cipher = encXTS(plain, skey, siv);
+                cipher = encTemplate<XTS_alter>(plain, skey, siv);
                 break;
             }
             case 7:{
-                cipher = encCCM(plain, skey, siv);
+                cipher = encTemplate<CCM_alter>(plain, skey, siv);
                 break;
             }
             case 8:{
-                cipher = encGCM(plain, skey, siv);
+                cipher = encTemplate<GCM_alter>(plain, skey, siv);
                 break;
             }
             default:
@@ -443,35 +353,35 @@ void decMenu(){
     for(int i = 0; i < 10000; i++){
         switch(mode){
             case 1:{
-                plain = decECB(cipherstr, skey);
+                plain = decTemplate<ECB>(cipherstr, skey, siv);
                 break;
             }
             case 2:{
-                plain = decCBC(cipherstr, skey, siv);
+                plain = decTemplate<CBC>(cipherstr, skey, siv);
                 break;
             }
             case 3:{
-                plain = decCFB(cipherstr, skey, siv);
+                plain = decTemplate<CFB>(cipherstr, skey, siv);
                 break;
             }
             case 4:{
-                plain = decOFB(cipherstr, skey, siv);
+                plain = decTemplate<OFB>(cipherstr, skey, siv);
                 break;
             }
             case 5:{
-                plain = decCTR(cipherstr, skey, siv);
+                plain = decTemplate<CTR>(cipherstr, skey, siv);
                 break;
             }
             case 6:{
-                plain = decXTS(cipherstr, skey, siv);
+                plain = decTemplate<XTS_alter>(cipherstr, skey, siv);
                 break;
             }
             case 7:{
-                plain = decCCM(cipherstr, skey, siv);
+                plain = decTemplate<CCM_alter>(cipherstr, skey, siv);
                 break;
             }
             case 8:{
-                plain = decGCM(cipherstr, skey, siv);
+                plain = decTemplate<GCM_alter>(cipherstr, skey, siv);
                 break;
             }
             default:
@@ -505,10 +415,13 @@ void decMenu(){
 int main(int argc, char* argv[])
 {
     #ifdef __linux__
-    setlocale(LC_ALL, "");
-    #elif _WIN32
-    _setmode(_fileno(stdin), _O_U16TEXT);
-    _setmode(_fileno(stdout), _O_U16TEXT);
+    std::locale::global(std::locale("C.UTF-8"));
+    #endif
+  
+    #ifdef _WIN32
+    // Set console code page to UTF-8 on Windows
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
     #endif
 
     int aescipher;

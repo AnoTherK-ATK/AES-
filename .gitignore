@@ -2,3 +2,8 @@
 .vscode/
 .vscode/*
 /*.exe
+lib/*
+include/*
+*.exe
+AES
+DES

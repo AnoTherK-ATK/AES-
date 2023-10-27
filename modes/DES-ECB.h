@@ -35,7 +35,7 @@ class ECB{
 public:
     ECB(){}
 
-    string encrypt(const string &plain, string skey){
+    string encrypt(const string &plain, string skey, string iv){
         string cipher;
         SecByteBlock key(reinterpret_cast<const CryptoPP::byte*>(&skey[0]), skey.size());
         ECB_Mode< DES >::Encryption e;
@@ -48,7 +48,7 @@ public:
         return cipher;
     }
 
-    string decrypt(const string &cipher, string skey){
+    string decrypt(const string &cipher, string skey, string iv){
         string recovered;
         SecByteBlock key(reinterpret_cast<const CryptoPP::byte*>(&skey[0]), skey.size());
         ECB_Mode< DES >::Decryption d;
