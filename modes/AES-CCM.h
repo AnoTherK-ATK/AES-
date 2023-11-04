@@ -43,7 +43,7 @@ public:
     string encrypt(const string &plain, string skey, string siv){
         string cipher;
         SecByteBlock key(reinterpret_cast<const CryptoPP::byte*>(&skey[0]), skey.size());
-        CryptoPP::byte iv[AES::BLOCKSIZE];
+        CryptoPP::byte iv[12];
 
         memcpy(iv, siv.c_str(), sizeof(iv)); 
         CCM< AES, 8 >::Encryption e;
@@ -59,7 +59,7 @@ public:
     string decrypt(const string &cipher, string skey, string siv){
         string recovered;
         SecByteBlock key(reinterpret_cast<const CryptoPP::byte*>(&skey[0]), skey.size());
-        CryptoPP::byte iv[AES::BLOCKSIZE];
+        CryptoPP::byte iv[12];
 
         memcpy(iv, siv.c_str(), sizeof(iv)); 
         CCM< AES, 8 >::Decryption d;

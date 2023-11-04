@@ -49,7 +49,7 @@ public:
         e.SetKeyWithIV(key, key.size(), iv);
         StringSource s(plain, true, 
             new StreamTransformationFilter(e,
-                new StringSink(cipher)
+                new StringSink(cipher), StreamTransformationFilter::NO_PADDING
             )    
         ); 
         return cipher;
@@ -64,7 +64,7 @@ public:
         d.SetKeyWithIV(key, key.size(), iv);
         StringSource s(cipher, true, 
             new StreamTransformationFilter(d,
-                new StringSink(recovered)
+                new StringSink(recovered), StreamTransformationFilter::NO_PADDING
             )    
         ); 
         return recovered;

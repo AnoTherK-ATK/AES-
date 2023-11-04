@@ -103,7 +103,7 @@ int IOMode;
 void randomKeyIV(){
     
     prng.GenerateBlock(key, key.size());
-    prng.GenerateBlock(iv, key.size());
+    prng.GenerateBlock(iv, iv.size());
 }
 
 void inputKeyIV(){

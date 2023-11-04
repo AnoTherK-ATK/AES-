@@ -102,13 +102,14 @@ using namespace CryptoPP;
 
 
 AutoSeededRandomPool prng;
-SecByteBlock key(AES::DEFAULT_KEYLENGTH);
+SecByteBlock key(32);
 SecByteBlock iv(AES::DEFAULT_KEYLENGTH);
+SecByteBlock ivCCM(12);
 int IOMode;
 void randomKeyIV(){
     
     prng.GenerateBlock(key, key.size());
-    prng.GenerateBlock(iv, key.size());
+    prng.GenerateBlock(iv, iv.size());
 }
 
 void inputKeyIV(){
@@ -251,10 +252,13 @@ void encMenu(){
         }
         case 2:{
             randomKeyIV();
+            if(mode == 7){
+                prng.GenerateBlock(ivCCM, ivCCM.size());
+            }
             cout << "key (Hex): " << (printHex(key)) << endl;
-            cout << "iv (Hex): " << (printHex(iv)) << endl;
+            cout << "iv (Hex): " << (mode == 7 ? printHex(ivCCM) : printHex(iv)) << endl;
             cout << "key (Base64): " << (printBase64(key));
-            cout << "iv (Base64): " << (printBase64(iv));
+            cout << "iv (Base64): " << (mode == 7 ? printBase64(ivCCM) : printBase64(iv));
             break;
         }
         default:
@@ -262,7 +266,7 @@ void encMenu(){
             break;
     }
     string skey = printHex(key);
-    string siv = printHex(iv);
+    string siv = (mode == 7 ? printHex(ivCCM) : printHex(iv));
     string cipher;
     auto start = std::chrono::high_resolution_clock::now();
     for(int i = 0; i < 10000; i++){

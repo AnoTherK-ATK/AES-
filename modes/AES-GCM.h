@@ -38,6 +38,7 @@ using CryptoPP::SecByteBlock;
 
 class GCM_alter{
 public:
+	const static int TAG_SIZE = 12;
 	GCM_alter(){}
 	string encrypt(const string &plain, string skey, string siv){
 		string cipher;
@@ -47,7 +48,7 @@ public:
 		e.SetKeyWithIV(key, key.size(), iv, iv.size());
 		StringSource s(plain, true, 
 			new AuthenticatedEncryptionFilter(e,
-				new StringSink(cipher)
+				new StringSink(cipher), false, TAG_SIZE
 			)    
 		); 
 		return cipher;
@@ -58,11 +59,8 @@ public:
 		SecByteBlock iv(reinterpret_cast<const CryptoPP::byte*>(&siv[0]), siv.size());
 		GCM< AES >::Decryption d;
 		d.SetKeyWithIV(key, key.size(), iv, iv.size());
-		StringSource s(cipher, true, 
-			new AuthenticatedDecryptionFilter(d,
-				new StringSink(recovered)
-			)    
-		); 
+		AuthenticatedDecryptionFilter df(d, new StringSink(recovered), AuthenticatedDecryptionFilter::DEFAULT_FLAGS, TAG_SIZE);
+		StringSource s(cipher, true, new Redirector(df));
 		return recovered;
 	}
 };
